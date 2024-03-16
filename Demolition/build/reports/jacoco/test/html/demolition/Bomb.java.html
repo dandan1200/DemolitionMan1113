@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Bomb.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">Bomb.java</span></div><h1>Bomb.java</h1><pre class="source lang-java linenums">package demolition;
+
+import java.util.ArrayList;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+public class Bomb {
+    public boolean isActive;
+    public boolean hasExploded;
+    private int timeToExplode;
+<span class="fc" id="L12">    private int[] coordinates = new int[2];</span>
+<span class="fc" id="L13">    private int spriteIndex = 0;</span>
+    private Explosion exp;
+<span class="fc" id="L15">    private ArrayList&lt;PImage&gt; sprites = new ArrayList&lt;PImage&gt;();</span>
+
+<span class="fc" id="L17">    public Bomb(int[] coords){</span>
+<span class="fc" id="L18">        this.coordinates[0] = coords[0];</span>
+<span class="fc" id="L19">        this.coordinates[1] = coords[1];</span>
+<span class="fc" id="L20">        this.hasExploded = false;</span>
+<span class="fc" id="L21">    }</span>
+
+    public void loadSprites(PApplet app){
+<span class="fc" id="L24">        this.sprites.add(app.loadImage(&quot;bomb/bomb.png&quot;));</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        for (int i = 1; i &lt; 8; i++){</span>
+<span class="fc" id="L26">            this.sprites.add(app.loadImage(&quot;bomb/bomb&quot; + i + &quot;.png&quot;));</span>
+        }
+<span class="fc" id="L28">    }</span>
+
+    public void detonate(PApplet app, Map map){
+<span class="fc" id="L31">        this.timeToExplode = 120;</span>
+<span class="fc" id="L32">        this.isActive = true;</span>
+<span class="fc" id="L33">        this.draw(app,map);</span>
+<span class="fc" id="L34">    }</span>
+
+    public void tick(PApplet app, Map map, BombGuy bombGuy, ArrayList&lt;YellowEnemy&gt; yEnemies, ArrayList&lt;RedEnemy&gt; rEnemies){
+<span class="fc" id="L37">        timeToExplode--;</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if (timeToExplode == 0) {</span>
+<span class="fc" id="L39">            this.exp = this.explode(app,map,bombGuy,yEnemies,rEnemies);</span>
+<span class="pc bpc" id="L40" title="1 of 4 branches missed.">        } else if (timeToExplode % 15 == 0 &amp;&amp; hasExploded == false){</span>
+<span class="fc" id="L41">            this.spriteIndex++;</span>
+<span class="fc" id="L42">            this.draw(app,map);</span>
+        }
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (hasExploded == true){</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">            if (this.exp.isActive() == true){</span>
+<span class="nc" id="L46">                this.exp.explodeTick(app,map,bombGuy,yEnemies,rEnemies);</span>
+            } else {
+<span class="fc" id="L48">                this.isActive = false;</span>
+            }
+        }
+
+        
+<span class="fc" id="L53">    }</span>
+    
+    public void draw(PApplet app, Map map){
+<span class="fc" id="L56">        app.image(map.getImages().get((this.coordinates[1]-64)/32).get(this.coordinates[0]/32), this.coordinates[0], this.coordinates[1]);</span>
+<span class="fc" id="L57">        app.image(this.sprites.get(spriteIndex),this.coordinates[0],this.coordinates[1]);</span>
+<span class="fc" id="L58">    }</span>
+
+    public Explosion explode(PApplet app, Map map, BombGuy bombGuy, ArrayList&lt;YellowEnemy&gt; yEnemies,ArrayList&lt;RedEnemy&gt; rEnemies){
+<span class="fc" id="L61">        app.image(map.getImages().get((this.coordinates[1]-64)/32).get(this.coordinates[0]/32), this.coordinates[0], this.coordinates[1]);</span>
+        //System.out.println(&quot;Exploded&quot;);
+<span class="fc" id="L63">        this.hasExploded = true;</span>
+<span class="fc" id="L64">        Explosion exp = new Explosion(coordinates[0], coordinates[1],app);</span>
+<span class="fc" id="L65">        exp.explodeTick(app, map, bombGuy,yEnemies,rEnemies);</span>
+<span class="fc" id="L66">        return exp;</span>
+
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

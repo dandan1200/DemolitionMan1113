@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="demolition.TestApp" tests="5" skipped="0" failures="0" errors="0" timestamp="2021-11-05T07:50:39" hostname="Daniels-MBP.modem" time="6.469">
+  <properties/>
+  <testcase name="moveUpOnce()" classname="demolition.TestApp" time="2.036"/>
+  <testcase name="placeBombOnSelf()" classname="demolition.TestApp" time="1.085"/>
+  <testcase name="moveRightOnce()" classname="demolition.TestApp" time="1.06"/>
+  <testcase name="moveDownOnce()" classname="demolition.TestApp" time="1.2"/>
+  <testcase name="moveLeftOnce()" classname="demolition.TestApp" time="1.084"/>
+  <system-out><![CDATA[***** SETUP GAME *****
+READ CONFIG FILE -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ ALL LEVELS -- PASSED
+LOADING ENEMIES...
+DRAWING MAP...
+***** SETUP COMPLETE - GAME STARTING *****
+***** SETUP GAME *****
+READ CONFIG FILE -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ ALL LEVELS -- PASSED
+LOADING ENEMIES...
+DRAWING MAP...
+***** SETUP COMPLETE - GAME STARTING *****
+Bomb Placed
+Dead
+MAP RESETTING
+***** SETUP GAME *****
+READ CONFIG FILE -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ ALL LEVELS -- PASSED
+LOADING ENEMIES...
+DRAWING MAP...
+***** SETUP COMPLETE - GAME STARTING *****
+***** SETUP GAME *****
+READ CONFIG FILE -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ ALL LEVELS -- PASSED
+LOADING ENEMIES...
+DRAWING MAP...
+***** SETUP COMPLETE - GAME STARTING *****
+***** SETUP GAME *****
+READ CONFIG FILE -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ LEVEL IMAGES -- PASSED
+READ ALL LEVELS -- PASSED
+LOADING ENEMIES...
+DRAWING MAP...
+***** SETUP COMPLETE - GAME STARTING *****
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

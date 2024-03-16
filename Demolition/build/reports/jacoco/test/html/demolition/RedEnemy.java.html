@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedEnemy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">RedEnemy.java</span></div><h1>RedEnemy.java</h1><pre class="source lang-java linenums">package demolition;
+
+import processing.core.PApplet;
+import java.util.Random;
+
+public class RedEnemy extends Enemy {
+<span class="fc" id="L7">    private int moveClock = 0;</span>
+
+    public RedEnemy(int[] coords){
+<span class="fc" id="L10">        super(coords);</span>
+<span class="fc" id="L11">    }</span>
+    public void chooseMove(PApplet app, Map map){
+<span class="fc" id="L13">        moveClock += 1;</span>
+<span class="fc bfc" id="L14" title="All 2 branches covered.">        if (moveClock == 60) {</span>
+<span class="fc" id="L15">            moveClock = 0;</span>
+<span class="fc bfc" id="L16" title="All 2 branches covered.">            if (this.currentDirection == &quot;Down&quot;) {</span>
+<span class="pc bpc" id="L17" title="1 of 2 branches missed.">                if(this.moveDown(app, map) == false){</span>
+<span class="fc" id="L18">                    randomMove(app, map);</span>
+                }
+            }
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">            else if (this.currentDirection == &quot;Left&quot;) {</span>
+<span class="pc bpc" id="L22" title="1 of 2 branches missed.">                if(this.moveLeft(app, map) == false){</span>
+<span class="nc" id="L23">                    randomMove(app, map);</span>
+
+                }
+            }
+            
+<span class="nc bnc" id="L28" title="All 2 branches missed.">            else if (this.currentDirection == &quot;Up&quot;) {</span>
+<span class="nc bnc" id="L29" title="All 2 branches missed.">                if(this.moveUp(app, map) == false){</span>
+<span class="nc" id="L30">                    randomMove(app, map);</span>
+
+                }
+            }
+<span class="nc bnc" id="L34" title="All 2 branches missed.">            else if (this.currentDirection == &quot;Right&quot;) {</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">                if(this.moveRight(app, map) == false){</span>
+<span class="nc" id="L36">                    randomMove(app, map);</span>
+
+                }
+            }
+        }
+<span class="fc" id="L41">    this.tick(app, map);</span>
+    
+<span class="fc" id="L43">    }</span>
+
+    private void randomMove(PApplet app, Map map){
+<span class="fc" id="L46">        Random rand = new Random();</span>
+<span class="fc" id="L47">        int number = rand.nextInt(4);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (number == 0){</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">            if (this.moveDown(app, map)== false){</span>
+<span class="fc" id="L50">                randomMove(app, map);</span>
+            } else {
+<span class="nc" id="L52">                return;</span>
+            }
+        }
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        else if (number == 1){</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">            if (this.moveRight(app, map)== false){</span>
+<span class="nc" id="L57">                randomMove(app, map);</span>
+            } else {
+<span class="nc" id="L59">                return;</span>
+            }
+        
+        }
+<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        else if (number == 2){</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">            if (this.moveUp(app, map)== false){</span>
+<span class="nc" id="L65">                randomMove(app, map);</span>
+            } else {
+<span class="nc" id="L67">                return;</span>
+            }
+        }
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        else if (number == 3){</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">            if (this.moveLeft(app, map)== false){</span>
+<span class="nc" id="L72">                randomMove(app, map);</span>
+            } else {
+<span class="fc" id="L74">                return;</span>
+            }
+        }
+
+
+<span class="fc" id="L79">    }</span>
+
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Map.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">Map.java</span></div><h1>Map.java</h1><pre class="source lang-java linenums">package demolition;
+
+import java.util.ArrayList;
+
+import processing.core.PImage;
+
+public class Map {
+<span class="fc" id="L8">    private int[] startCoords = new int[2];</span>
+<span class="fc" id="L9">    private int time = 0;</span>
+<span class="fc" id="L10">    private ArrayList&lt;ArrayList&lt;PImage&gt;&gt; images = new ArrayList&lt;ArrayList&lt;PImage&gt;&gt;();</span>
+<span class="fc" id="L11">    private ArrayList&lt;ArrayList&lt;String&gt;&gt; textMap = new ArrayList&lt;ArrayList&lt;String&gt;&gt;();</span>
+<span class="fc" id="L12">    private ArrayList&lt;int[]&gt; yellowEnemyStartCoords = new ArrayList&lt;int[]&gt;();</span>
+<span class="fc" id="L13">    private ArrayList&lt;int[]&gt; redEnemyStartCoords = new ArrayList&lt;int[]&gt;();</span>
+
+<span class="fc" id="L15">    private ArrayList&lt;ArrayList&lt;PImage&gt;&gt; originalImages = new ArrayList&lt;ArrayList&lt;PImage&gt;&gt;();</span>
+<span class="fc" id="L16">    private ArrayList&lt;ArrayList&lt;String&gt;&gt; originalTextMap = new ArrayList&lt;ArrayList&lt;String&gt;&gt;();</span>
+
+    private PImage blankTile;
+
+<span class="fc" id="L20">    public Map(int[] startCoords, int time, ArrayList&lt;ArrayList&lt;PImage&gt;&gt; images, ArrayList&lt;ArrayList&lt;String&gt;&gt; textMap, ArrayList&lt;int[]&gt; yellowEnemyCoords,ArrayList&lt;int[]&gt; redEnemyCoords){</span>
+<span class="fc" id="L21">        this.startCoords = startCoords;</span>
+<span class="fc" id="L22">        this.time = time;</span>
+<span class="fc" id="L23">        this.originalImages = images;</span>
+<span class="fc" id="L24">        this.originalTextMap = textMap;</span>
+<span class="fc" id="L25">        this.blankTile = images.get(startCoords[1]/32).get(startCoords[0]/32);</span>
+<span class="fc" id="L26">        this.yellowEnemyStartCoords = yellowEnemyCoords; </span>
+<span class="fc" id="L27">        this.redEnemyStartCoords = redEnemyCoords; </span>
+<span class="fc" id="L28">        copyMap(images, textMap);</span>
+        
+
+<span class="fc" id="L31">    }</span>
+
+    public void copyMap(ArrayList&lt;ArrayList&lt;PImage&gt;&gt; images, ArrayList&lt;ArrayList&lt;String&gt;&gt; textMap){
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        for (ArrayList&lt;PImage&gt; a: images) {</span>
+<span class="fc" id="L35">            ArrayList&lt;PImage&gt; newLine = new ArrayList&lt;PImage&gt;();</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">            for (PImage p: a){</span>
+<span class="fc" id="L37">                newLine.add(p);</span>
+<span class="fc" id="L38">            }</span>
+<span class="fc" id="L39">            this.images.add(newLine);</span>
+<span class="fc" id="L40">        }</span>
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">        for (ArrayList&lt;String&gt; a: textMap) {</span>
+<span class="fc" id="L43">            ArrayList&lt;String&gt; newLine = new ArrayList&lt;String&gt;();</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">            for (String s: a){</span>
+<span class="fc" id="L45">                newLine.add(s);</span>
+<span class="fc" id="L46">            }</span>
+<span class="fc" id="L47">            this.textMap.add(newLine);</span>
+<span class="fc" id="L48">        }</span>
+<span class="fc" id="L49">    }</span>
+
+    public void wallDestroyed(int x, int y){
+<span class="fc" id="L52">        ArrayList&lt;String&gt; newList = this.textMap.get(y);</span>
+<span class="fc" id="L53">        newList.set(x,&quot; &quot;);</span>
+<span class="fc" id="L54">        this.textMap.set(y, newList);</span>
+
+<span class="fc" id="L56">        ArrayList&lt;PImage&gt; newPList = this.images.get(y);</span>
+<span class="fc" id="L57">        newPList.set(x, blankTile);</span>
+<span class="fc" id="L58">        this.images.set(y, newPList);</span>
+<span class="fc" id="L59">    }</span>
+
+    public ArrayList&lt;int[]&gt; getYellowEnemies(){
+<span class="fc" id="L62">        return this.yellowEnemyStartCoords;</span>
+    }
+    public ArrayList&lt;int[]&gt; getRedEnemies(){
+<span class="fc" id="L65">        return this.redEnemyStartCoords;</span>
+    }
+    public int[] getStartCoords(){
+<span class="fc" id="L68">        return this.startCoords;</span>
+    }
+    public int getTime(){
+<span class="fc" id="L71">        return this.time;</span>
+    }
+    public ArrayList&lt;ArrayList&lt;PImage&gt;&gt; getImages(){
+<span class="fc" id="L74">        return this.images;</span>
+    }
+    public ArrayList&lt;ArrayList&lt;String&gt;&gt; getTextMap(){
+<span class="fc" id="L77">        return this.textMap;</span>
+    }
+
+    public void reset(){
+<span class="fc" id="L81">        System.out.println(&quot;MAP RESETTING&quot;);</span>
+<span class="fc" id="L82">        this.images = new ArrayList&lt;ArrayList&lt;PImage&gt;&gt;();</span>
+<span class="fc" id="L83">        this.textMap = new ArrayList&lt;ArrayList&lt;String&gt;&gt;();</span>
+<span class="fc" id="L84">        copyMap(this.originalImages, this.originalTextMap);</span>
+        
+<span class="fc" id="L86">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

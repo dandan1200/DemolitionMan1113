@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Sprite.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">Sprite.java</span></div><h1>Sprite.java</h1><pre class="source lang-java linenums">package demolition;
+
+import java.util.ArrayList;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+
+
+public abstract class Sprite {
+<span class="fc" id="L11">    public int[] startCoords = new int[2];</span>
+<span class="fc" id="L12">    protected int[] currentCoords = new int[2];</span>
+<span class="fc" id="L13">    private String[] directions = {&quot;_down&quot;,&quot;_up&quot;,&quot;_left&quot;,&quot;_right&quot;}; </span>
+
+    // Animation resources
+<span class="fc" id="L16">    protected ArrayList&lt;PImage&gt; northFacingImages = new ArrayList&lt;PImage&gt;();</span>
+<span class="fc" id="L17">    protected ArrayList&lt;PImage&gt; southFacingImages = new ArrayList&lt;PImage&gt;();</span>
+<span class="fc" id="L18">    protected ArrayList&lt;PImage&gt; eastFacingImages = new ArrayList&lt;PImage&gt;();</span>
+<span class="fc" id="L19">    protected ArrayList&lt;PImage&gt; westFacingImages = new ArrayList&lt;PImage&gt;();</span>
+    
+    // Current frame information for sprite
+    private PImage currentFrame;
+    protected String currentDirection;
+    private int currentFrameNum;
+<span class="fc" id="L25">    private int frameNextIndex = 0;</span>
+
+    protected boolean alive;
+
+    // Constructor
+<span class="fc" id="L30">    public Sprite(int[] startCoords) {</span>
+<span class="fc" id="L31">        this.startCoords = startCoords;</span>
+<span class="fc" id="L32">        this.currentCoords[0] = startCoords[0];</span>
+<span class="fc" id="L33">        this.currentCoords[1] = startCoords[1];</span>
+<span class="fc" id="L34">        this.alive = true;</span>
+<span class="fc" id="L35">    }</span>
+    
+    // Load images for animation of sprite
+    public void loadResources(String nameFormat, PApplet app){
+        //Load down facing images
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        for (int i = 0; i &lt; 4; i ++){</span>
+<span class="fc" id="L41">            String path = nameFormat + directions[0] + String.valueOf(i+1) + &quot;.png&quot;;</span>
+<span class="fc" id="L42">            southFacingImages.add(app.loadImage(path));</span>
+        }
+        //load up facing images
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        for (int i = 0; i &lt; 4; i ++){</span>
+<span class="fc" id="L46">            String path = nameFormat + directions[1] + String.valueOf(i+1) + &quot;.png&quot;;</span>
+<span class="fc" id="L47">            northFacingImages.add(app.loadImage(path));</span>
+        }
+        //load left facing images
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        for (int i = 0; i &lt; 4; i ++){</span>
+<span class="fc" id="L51">            String path = nameFormat + directions[2] + String.valueOf(i+1) + &quot;.png&quot;;</span>
+<span class="fc" id="L52">            westFacingImages.add(app.loadImage(path));</span>
+        }
+        //load right facing images
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        for (int i = 0; i &lt; 4; i ++){</span>
+<span class="fc" id="L56">            String path = nameFormat + directions[3] + String.valueOf(i+1) + &quot;.png&quot;;</span>
+<span class="fc" id="L57">            eastFacingImages.add(app.loadImage(path));</span>
+        }
+        //Set first frame
+<span class="fc" id="L60">        currentFrame = southFacingImages.get(0);</span>
+<span class="fc" id="L61">        currentFrameNum = 0;</span>
+<span class="fc" id="L62">        currentDirection = &quot;Down&quot;;</span>
+
+
+<span class="fc" id="L65">    }</span>
+
+    //Single tick logic
+    public void tick(PApplet app, Map map){
+        //Wait 0.2 seconds before switching to next frame
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (frameNextIndex == 11){</span>
+<span class="fc" id="L71">            frameNextIndex = 0;</span>
+<span class="fc" id="L72">            this.draw(app, map);</span>
+        }
+<span class="fc" id="L74">        frameNextIndex++;</span>
+<span class="fc" id="L75">    }</span>
+
+    public void draw(PApplet app, Map map){
+        //Draw current frame and set next frame.
+<span class="fc" id="L79">        this.drawOverMove(app, map, currentCoords[0]/32, (currentCoords[1]/32)-2);</span>
+<span class="fc" id="L80">        app.image(currentFrame,currentCoords[0],currentCoords[1]-12);</span>
+<span class="fc" id="L81">        nextImage();</span>
+<span class="fc" id="L82">    }</span>
+    
+    public void nextImage(){
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (currentFrameNum == 3){</span>
+<span class="fc" id="L86">            currentFrameNum = 0;</span>
+        }
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        if (currentDirection == &quot;Down&quot;){</span>
+<span class="fc" id="L89">            currentFrame = southFacingImages.get(currentFrameNum+1);</span>
+<span class="fc" id="L90">            currentFrameNum += 1;</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        } else if(currentDirection == &quot;Left&quot;){</span>
+<span class="fc" id="L92">            currentFrame = westFacingImages.get(currentFrameNum+1);</span>
+<span class="fc" id="L93">            currentFrameNum += 1;</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        } else if(currentDirection == &quot;Right&quot;){</span>
+<span class="fc" id="L95">            currentFrame = eastFacingImages.get(currentFrameNum+1);</span>
+<span class="fc" id="L96">            currentFrameNum += 1;</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        } else if(currentDirection == &quot;Up&quot;){</span>
+<span class="nc" id="L98">            currentFrame = northFacingImages.get(currentFrameNum+1);</span>
+<span class="nc" id="L99">            currentFrameNum += 1;</span>
+        }
+<span class="fc" id="L101">    }</span>
+
+    public int[] getCoords(){
+<span class="fc" id="L104">        return this.currentCoords;</span>
+    }
+
+    public Boolean moveRight(PApplet app, Map map){
+<span class="fc" id="L108">        int currentMapX = this.currentCoords[0]/32;</span>
+<span class="fc" id="L109">        int currentMapY = (this.currentCoords[1]-64)/32;</span>
+
+<span class="pc bpc" id="L111" title="3 of 4 branches missed.">        if (map.getTextMap().get(currentMapY).get(currentMapX+1).equals(&quot; &quot;) || map.getTextMap().get(currentMapY).get(currentMapX+1).equals(&quot;G&quot;)){</span>
+            // Move right if free next to player.
+<span class="fc" id="L113">            currentCoords[0] += 32;</span>
+<span class="fc" id="L114">            this.currentDirection = &quot;Right&quot;;</span>
+<span class="fc" id="L115">            this.nextImage();</span>
+<span class="fc" id="L116">            this.drawOverMove(app, map, currentMapX, currentMapY);</span>
+<span class="fc" id="L117">            this.draw(app,map);</span>
+            //System.out.println(&quot;MOVED RIGHT 1 SPACE&quot;);
+<span class="fc" id="L119">            return true;</span>
+        }
+<span class="nc" id="L121">        return false;</span>
+    }
+
+    public Boolean moveDown(PApplet app, Map map){
+<span class="fc" id="L125">        int currentMapX = this.currentCoords[0]/32;</span>
+<span class="fc" id="L126">        int currentMapY = (this.currentCoords[1]-64)/32;</span>
+        
+<span class="pc bpc" id="L128" title="1 of 4 branches missed.">        if (map.getTextMap().get(currentMapY+1).get(currentMapX).equals(&quot; &quot;) || map.getTextMap().get(currentMapY+1).get(currentMapX).equals(&quot;G&quot;)){</span>
+            // Move right if free next to player.
+<span class="fc" id="L130">            currentCoords[1] += 32;</span>
+<span class="fc" id="L131">            this.currentDirection = &quot;Down&quot;;</span>
+<span class="fc" id="L132">            this.nextImage();</span>
+<span class="fc" id="L133">            this.drawOverMove(app, map, currentMapX, currentMapY);</span>
+<span class="fc" id="L134">            this.draw(app,map);</span>
+            //System.out.println(&quot;MOVED DOWN 1 SPACE&quot;);
+<span class="fc" id="L136">            return true;</span>
+        }
+<span class="fc" id="L138">        return false;</span>
+    }
+    public Boolean moveLeft(PApplet app, Map map){
+<span class="fc" id="L141">        int currentMapX = this.currentCoords[0]/32;</span>
+<span class="fc" id="L142">        int currentMapY = (this.currentCoords[1]-64)/32;</span>
+        
+<span class="pc bpc" id="L144" title="1 of 4 branches missed.">        if (map.getTextMap().get(currentMapY).get(currentMapX-1).equals(&quot; &quot;) || map.getTextMap().get(currentMapY).get(currentMapX-1).equals(&quot;G&quot;)){</span>
+            // Move right if free next to player.
+<span class="fc" id="L146">            currentCoords[0] -= 32;</span>
+<span class="fc" id="L147">            this.currentDirection = &quot;Left&quot;;</span>
+<span class="fc" id="L148">            this.nextImage();</span>
+<span class="fc" id="L149">            this.drawOverMove(app, map, currentMapX, currentMapY);</span>
+<span class="fc" id="L150">            this.draw(app,map);</span>
+            //System.out.println(&quot;MOVED LEFT 1 SPACE&quot;);
+<span class="fc" id="L152">            return true;</span>
+        }
+<span class="fc" id="L154">        return false;</span>
+    }
+    public Boolean moveUp(PApplet app, Map map){
+<span class="fc" id="L157">        int currentMapX = this.currentCoords[0]/32;</span>
+<span class="fc" id="L158">        int currentMapY = (this.currentCoords[1]-64)/32;</span>
+        
+<span class="pc bpc" id="L160" title="2 of 4 branches missed.">        if (map.getTextMap().get(currentMapY-1).get(currentMapX).equals(&quot; &quot;) || map.getTextMap().get(currentMapY-1).get(currentMapX).equals(&quot;G&quot;)){</span>
+            // Move right if free next to player.
+<span class="nc" id="L162">            currentCoords[1] -= 32;</span>
+<span class="nc" id="L163">            this.currentDirection = &quot;Up&quot;;</span>
+<span class="nc" id="L164">            this.nextImage();</span>
+<span class="nc" id="L165">            this.drawOverMove(app, map, currentMapX, currentMapY);</span>
+<span class="nc" id="L166">            this.draw(app,map);</span>
+            //System.out.println(&quot;MOVED UP 1 SPACE&quot;);
+<span class="nc" id="L168">            return true;</span>
+        }
+<span class="fc" id="L170">        return false;</span>
+    }
+
+    protected void drawOverMove(PApplet app,Map map, int x, int y){
+        try{
+<span class="fc" id="L175">            app.image(map.getImages().get(y-1).get(x), x*32, y*32 + 32);</span>
+<span class="fc" id="L176">            app.image(map.getImages().get(y).get(x), x*32, y*32 + 64);</span>
+<span class="fc" id="L177">            app.image(map.getImages().get(y+1).get(x), x*32, y*32 + 96);</span>
+<span class="nc" id="L178">        } catch (Exception e){</span>
+<span class="nc" id="L179">            System.out.println(e);</span>
+            
+<span class="fc" id="L181">        }</span>
+
+<span class="fc" id="L183">    }</span>
+
+    public void setCoords(int x, int y){
+<span class="fc" id="L186">        this.currentCoords[0] = x;</span>
+<span class="fc" id="L187">        this.currentCoords[1] = y;</span>
+<span class="fc" id="L188">    }</span>
+
+    public abstract void kill(Map map);
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

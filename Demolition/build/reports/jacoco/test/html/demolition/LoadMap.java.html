@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoadMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">LoadMap.java</span></div><h1>LoadMap.java</h1><pre class="source lang-java linenums">package demolition;
+
+import processing.core.*;
+import java.util.*;
+import java.io.*;
+
+public class LoadMap {
+    public PImage solidWall;
+    public PImage brokenWall;
+    public PImage emptyTile;
+    public PImage goalTile;
+    private File levelConfigFile;
+<span class="fc" id="L13">    private int[] bombGuyStartCoords = new int[2];</span>
+<span class="fc" id="L14">    private ArrayList&lt;int[]&gt; redEnemyStartCoords = new ArrayList&lt;int[]&gt;();</span>
+<span class="fc" id="L15">    private ArrayList&lt;int[]&gt; yellowEnemyStartCoords= new ArrayList&lt;int[]&gt;();</span>
+<span class="fc" id="L16">    private ArrayList&lt;ArrayList&lt;String&gt;&gt; textMap = new ArrayList&lt;ArrayList&lt;String&gt;&gt;();</span>
+
+<span class="fc" id="L18">    public LoadMap(File levelConfigFile){</span>
+<span class="fc" id="L19">        this.levelConfigFile = levelConfigFile;</span>
+<span class="fc" id="L20">    }</span>
+
+    public int[] getBombGuyStartCoords(){
+<span class="fc" id="L23">        return this.bombGuyStartCoords;</span>
+    }
+
+    public ArrayList&lt;ArrayList&lt;String&gt;&gt; getTextMap(int index){
+<span class="fc" id="L27">        return this.textMap;</span>
+    }
+
+    public ArrayList&lt;ArrayList&lt;PImage&gt;&gt; getMapImages(PApplet app){
+<span class="fc" id="L31">        ArrayList&lt;ArrayList&lt;String&gt;&gt; textMap = new ArrayList&lt;ArrayList&lt;String&gt;&gt;();</span>
+<span class="fc" id="L32">        ArrayList&lt;ArrayList&lt;PImage&gt;&gt; images = new ArrayList&lt;ArrayList&lt;PImage&gt;&gt;();</span>
+        Scanner read;
+        String line;
+
+        //read images
+        try {
+<span class="fc" id="L38">            this.solidWall = app.loadImage(&quot;src/main/resources/wall/solid.png&quot;);</span>
+<span class="fc" id="L39">            this.brokenWall = app.loadImage(&quot;src/main/resources/broken/broken.png&quot;);</span>
+<span class="fc" id="L40">            this.emptyTile = app.loadImage(&quot;src/main/resources/empty/empty.png&quot;);</span>
+<span class="fc" id="L41">            this.goalTile = app.loadImage(&quot;src/main/resources/goal/goal.png&quot;);</span>
+
+<span class="nc" id="L43">        } catch (Exception e){</span>
+<span class="nc" id="L44">            System.out.println(&quot;Error: image resources not found.&quot;);</span>
+<span class="fc" id="L45">        }</span>
+<span class="fc" id="L46">        System.out.println(&quot;READ LEVEL IMAGES -- PASSED&quot;);</span>
+        //add images to 2d arraylist from level config file
+        //read map file
+        try {
+<span class="fc" id="L50">            read = new Scanner(levelConfigFile);</span>
+            //System.out.println(&quot;Passed Scan file&quot;);
+
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            for (int lineIndex = 0; lineIndex &lt; 13; lineIndex++){</span>
+<span class="fc" id="L54">                line = read.nextLine();</span>
+<span class="fc" id="L55">                textMap.add(new ArrayList&lt;String&gt;());</span>
+<span class="fc" id="L56">                ArrayList&lt;PImage&gt; imageLine = new ArrayList&lt;PImage&gt;();</span>
+                //System.out.println(&quot;Passed read file&quot;);
+
+<span class="fc bfc" id="L59" title="All 2 branches covered.">                for (int charIndex = 0; charIndex &lt; line.length(); charIndex++){</span>
+    
+<span class="fc bfc" id="L61" title="All 2 branches covered.">                    if (line.charAt(charIndex) == &quot;W&quot;.charAt(0)) {</span>
+<span class="fc" id="L62">                        imageLine.add(this.solidWall);</span>
+<span class="fc" id="L63">                        textMap.get(lineIndex).add(&quot;W&quot;);</span>
+                        //System.out.println(&quot;Passed added w&quot;);
+
+<span class="fc bfc" id="L66" title="All 2 branches covered.">                    } else if (line.charAt(charIndex) == &quot;B&quot;.charAt(0)) {</span>
+<span class="fc" id="L67">                        imageLine.add(this.brokenWall);</span>
+<span class="fc" id="L68">                        textMap.get(lineIndex).add(&quot;B&quot;);</span>
+                        //System.out.println(&quot;Passed added b&quot;);
+
+<span class="fc bfc" id="L71" title="All 2 branches covered.">                    } else if (line.charAt(charIndex) == &quot; &quot;.charAt(0)) {</span>
+<span class="fc" id="L72">                        imageLine.add(this.emptyTile);</span>
+<span class="fc" id="L73">                        textMap.get(lineIndex).add(&quot; &quot;);</span>
+                        //System.out.println(&quot;Passed added space&quot;);
+
+<span class="fc bfc" id="L76" title="All 2 branches covered.">                    } else if (line.charAt(charIndex) == &quot;G&quot;.charAt(0)) {</span>
+<span class="fc" id="L77">                        imageLine.add(this.goalTile);</span>
+<span class="fc" id="L78">                        textMap.get(lineIndex).add(&quot;G&quot;);</span>
+                        //System.out.println(&quot;Passed added g&quot;);
+
+<span class="fc bfc" id="L81" title="All 2 branches covered.">                    } else if (line.charAt(charIndex) == &quot;P&quot;.charAt(0)) {</span>
+<span class="fc" id="L82">                        this.bombGuyStartCoords[0] = charIndex*32;</span>
+<span class="fc" id="L83">                        this.bombGuyStartCoords[1] = lineIndex*32 + 64;</span>
+<span class="fc" id="L84">                        imageLine.add(this.emptyTile);</span>
+<span class="fc" id="L85">                        textMap.get(lineIndex).add(&quot; &quot;);</span>
+                        //System.out.println(&quot;Passed added p&quot;);
+
+<span class="fc bfc" id="L88" title="All 2 branches covered.">                    } else if (line.charAt(charIndex) == &quot;R&quot;.charAt(0)) {</span>
+<span class="fc" id="L89">                        int[] coords = {charIndex,lineIndex};</span>
+<span class="fc" id="L90">                        this.redEnemyStartCoords.add(coords);</span>
+<span class="fc" id="L91">                        imageLine.add(this.emptyTile);</span>
+<span class="fc" id="L92">                        textMap.get(lineIndex).add(&quot; &quot;);</span>
+                        //System.out.println(&quot;Passed added r&quot;);
+
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">                    } else if (line.charAt(charIndex) == &quot;Y&quot;.charAt(0)) {</span>
+<span class="fc" id="L96">                        int[] coords = {charIndex,lineIndex};</span>
+                        //System.out.println(&quot;Found y&quot;);
+<span class="fc" id="L98">                        this.yellowEnemyStartCoords.add(coords);</span>
+<span class="fc" id="L99">                        imageLine.add(this.emptyTile);</span>
+<span class="fc" id="L100">                        textMap.get(lineIndex).add(&quot; &quot;);</span>
+                        //System.out.println(&quot;Passed added y&quot;);
+
+                    }
+    
+                }
+<span class="fc" id="L106">                images.add(imageLine);</span>
+                
+            }
+<span class="fc" id="L109">            this.textMap = textMap;</span>
+<span class="fc" id="L110">            read.close();</span>
+
+<span class="nc" id="L112">        } catch (FileNotFoundException e){</span>
+<span class="nc" id="L113">            System.out.println(&quot;No config file&quot;);</span>
+<span class="fc" id="L114">        }</span>
+
+<span class="fc" id="L116">        return images;</span>
+        
+    }
+    
+    public ArrayList&lt;int[]&gt; getYellowEnemies(){
+<span class="fc" id="L121">        return this.yellowEnemyStartCoords;</span>
+    }
+    public ArrayList&lt;int[]&gt; getRedEnemies(){
+<span class="fc" id="L124">        return this.redEnemyStartCoords;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

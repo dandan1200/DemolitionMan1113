@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Explosion.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">Explosion.java</span></div><h1>Explosion.java</h1><pre class="source lang-java linenums">package demolition;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+import java.util.ArrayList;
+
+public class Explosion {
+    private PImage verticalSprite;
+    private PImage horizontalSprite;
+    private PImage centreSprite;
+    private int explosionPointX;
+    private int explosionPointY;
+<span class="fc" id="L13">    private int time = 30;</span>
+    private boolean active;
+<span class="fc" id="L15">    private ArrayList&lt;Integer[]&gt; explosionArea = new ArrayList&lt;Integer[]&gt;();</span>
+
+<span class="fc" id="L17">    public Explosion(int x, int y, PApplet app){</span>
+<span class="fc" id="L18">        explosionPointX = x/32;</span>
+<span class="fc" id="L19">        explosionPointY = y/32 - 2;</span>
+<span class="fc" id="L20">        active = true;</span>
+
+        // Load images
+<span class="fc" id="L23">        verticalSprite = app.loadImage(&quot;explosion/vertical.png&quot;);</span>
+<span class="fc" id="L24">        horizontalSprite = app.loadImage(&quot;explosion/horizontal.png&quot;);</span>
+<span class="fc" id="L25">        centreSprite = app.loadImage(&quot;explosion/centre.png&quot;);</span>
+<span class="fc" id="L26">    }</span>
+
+    public boolean isActive(){
+<span class="fc" id="L29">        return this.active;</span>
+    }
+
+    public boolean explodeTick(PApplet app, Map map, BombGuy bombGuy, ArrayList&lt;YellowEnemy&gt; yEnemies, ArrayList&lt;RedEnemy&gt; rEnemies){
+<span class="fc" id="L33">        time -= 1;</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        if (time == 0){</span>
+<span class="nc" id="L35">            active = false;</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">            for (Integer[] c: explosionArea){</span>
+<span class="nc" id="L37">                app.image(map.getImages().get(c[1]).get(c[0]), c[0]*32, c[1]*32+64);</span>
+<span class="nc" id="L38">            }</span>
+
+
+<span class="nc" id="L41">            return active;</span>
+        } else {
+            //centre
+<span class="fc" id="L44">            app.image(centreSprite, explosionPointX*32, explosionPointY*32+64);</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">            if (time == 29){</span>
+<span class="fc" id="L46">                Integer[] coords = {explosionPointX,explosionPointY};</span>
+<span class="fc" id="L47">                explosionArea.add(coords);</span>
+            }
+
+            try {
+            //vertical
+<span class="pc bpc" id="L52" title="2 of 4 branches missed.">            if (map.getTextMap().get(explosionPointY-1).get(explosionPointX).equals(&quot; &quot;) || map.getTextMap().get(explosionPointY-1).get(explosionPointX).equals(&quot;B&quot;)) {</span>
+<span class="nc" id="L53">                app.image(verticalSprite, explosionPointX*32, (explosionPointY-1)*32 + 64);</span>
+<span class="nc" id="L54">                map.wallDestroyed(explosionPointX, explosionPointY-1);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                if (time == 29){</span>
+<span class="nc" id="L56">                    Integer[] coords9 = {explosionPointX,explosionPointY-1};</span>
+<span class="nc" id="L57">                    explosionArea.add(coords9);</span>
+                }
+<span class="nc bnc" id="L59" title="All 6 branches missed.">                if (map.getTextMap().get(explosionPointY-2).get(explosionPointX).equals(&quot; &quot;) || (map.getTextMap().get(explosionPointY-2).get(explosionPointX).equals(&quot;B&quot;) &amp;&amp; map.getTextMap().get(explosionPointY-1).get(explosionPointX).equals(&quot;B&quot;)== false)) {</span>
+<span class="nc" id="L60">                    app.image(verticalSprite, explosionPointX*32, (explosionPointY-2)*32+ 64);</span>
+<span class="nc" id="L61">                    map.wallDestroyed(explosionPointX, explosionPointY-2);</span>
+                    
+<span class="nc bnc" id="L63" title="All 2 branches missed.">                    if (time == 29){</span>
+<span class="nc" id="L64">                        Integer[] coords2 = {explosionPointX,explosionPointY-2};</span>
+<span class="nc" id="L65">                        explosionArea.add(coords2);</span>
+                    }
+                }
+            }
+
+<span class="pc bpc" id="L70" title="3 of 4 branches missed.">            if (map.getTextMap().get(explosionPointY+1).get(explosionPointX).equals(&quot; &quot;) || map.getTextMap().get(explosionPointY+1).get(explosionPointX).equals(&quot;B&quot;)) {</span>
+<span class="fc" id="L71">                app.image(verticalSprite, explosionPointX*32, (explosionPointY+1)*32+ 64);</span>
+<span class="fc" id="L72">                map.wallDestroyed(explosionPointX, explosionPointY+1);</span>
+                
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">                if (time == 29){</span>
+<span class="fc" id="L75">                    Integer[] coords3 = {explosionPointX,explosionPointY+1};</span>
+<span class="fc" id="L76">                    explosionArea.add(coords3);</span>
+                }
+
+<span class="pc bpc" id="L79" title="3 of 4 branches missed.">                if (map.getTextMap().get(explosionPointY+2).get(explosionPointX).equals(&quot; &quot;) || map.getTextMap().get(explosionPointY+2).get(explosionPointX).equals(&quot;B&quot;)) {</span>
+<span class="fc" id="L80">                    app.image(verticalSprite, explosionPointX*32, (explosionPointY+2)*32+ 64);</span>
+<span class="fc" id="L81">                    map.wallDestroyed(explosionPointX, explosionPointY+2);</span>
+                    
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">                    if (time == 29){</span>
+<span class="fc" id="L84">                        Integer[] coords4 = {explosionPointX,explosionPointY+2};</span>
+<span class="fc" id="L85">                        explosionArea.add(coords4);</span>
+                    }
+                }
+            }
+
+            //horizontal
+<span class="pc bpc" id="L91" title="2 of 4 branches missed.">            if (map.getTextMap().get(explosionPointY).get(explosionPointX-1).equals(&quot; &quot;) || map.getTextMap().get(explosionPointY).get(explosionPointX-1).equals(&quot;B&quot;)) {</span>
+<span class="nc" id="L92">                app.image(horizontalSprite, (explosionPointX-1)*32, explosionPointY*32+ 64);</span>
+<span class="nc" id="L93">                map.wallDestroyed(explosionPointX-1, explosionPointY);</span>
+                
+<span class="nc bnc" id="L95" title="All 2 branches missed.">                if (time == 29){</span>
+<span class="nc" id="L96">                    Integer[] coords5 = {explosionPointX-1,explosionPointY};</span>
+<span class="nc" id="L97">                    explosionArea.add(coords5);</span>
+                }
+                
+<span class="nc bnc" id="L100" title="All 4 branches missed.">                if (map.getTextMap().get(explosionPointY).get(explosionPointX-2).equals(&quot; &quot;) || map.getTextMap().get(explosionPointY).get(explosionPointX-2).equals(&quot;B&quot;)) {</span>
+<span class="nc" id="L101">                    app.image(horizontalSprite, (explosionPointX-2)*32, explosionPointY*32+ 64);</span>
+<span class="nc" id="L102">                    map.wallDestroyed(explosionPointX-2, explosionPointY);</span>
+                    
+<span class="nc bnc" id="L104" title="All 2 branches missed.">                    if (time == 29){</span>
+<span class="nc" id="L105">                        Integer[] coords6 = {explosionPointX-2,explosionPointY};</span>
+<span class="nc" id="L106">                        explosionArea.add(coords6);</span>
+                    }
+                }
+            }
+<span class="pc bpc" id="L110" title="3 of 4 branches missed.">            if (map.getTextMap().get(explosionPointY).get(explosionPointX+1).equals(&quot; &quot;) || map.getTextMap().get(explosionPointY).get(explosionPointX+1).equals(&quot;B&quot;)) {</span>
+<span class="fc" id="L111">                app.image(horizontalSprite, (explosionPointX+1)*32, explosionPointY*32+ 64);</span>
+<span class="fc" id="L112">                map.wallDestroyed(explosionPointX+1, explosionPointY);</span>
+                
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">                if (time == 29){</span>
+<span class="fc" id="L115">                    Integer[] coords7 = {explosionPointX+1,explosionPointY};</span>
+<span class="fc" id="L116">                    explosionArea.add(coords7);</span>
+                }
+<span class="pc bpc" id="L118" title="3 of 4 branches missed.">                if (map.getTextMap().get(explosionPointY).get(explosionPointX+2).equals(&quot; &quot;) || map.getTextMap().get(explosionPointY).get(explosionPointX+2).equals(&quot;B&quot;)) {</span>
+<span class="fc" id="L119">                    app.image(horizontalSprite, (explosionPointX+2)*32, explosionPointY*32+ 64);</span>
+<span class="fc" id="L120">                    map.wallDestroyed(explosionPointX+2, explosionPointY);</span>
+                    
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">                    if (time == 29){</span>
+<span class="fc" id="L123">                        Integer[] coords8 = {explosionPointX+2,explosionPointY};</span>
+<span class="fc" id="L124">                        explosionArea.add(coords8);</span>
+                    }
+                }
+            }
+<span class="nc" id="L128">            } catch (Exception e){</span>
+<span class="nc" id="L129">                System.out.println(e);</span>
+<span class="fc" id="L130">            }</span>
+            //KILL BOMBGUY
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">            for (Integer[] i: explosionArea){</span>
+<span class="pc bpc" id="L133" title="2 of 4 branches missed.">                if (i[0] == bombGuy.getCoords()[0]/32 &amp;&amp; i[1] == bombGuy.getCoords()[1]/32 - 2 ){</span>
+<span class="fc" id="L134">                    System.out.println(&quot;Dead&quot;);</span>
+<span class="fc" id="L135">                    bombGuy.kill(map);</span>
+<span class="fc" id="L136">                    this.active = false;</span>
+<span class="fc" id="L137">                    return active;</span>
+    
+                }
+                //Kill enemies
+<span class="nc bnc" id="L141" title="All 2 branches missed.">                for (YellowEnemy y: yEnemies){</span>
+<span class="nc bnc" id="L142" title="All 4 branches missed.">                    if (i[0] == y.getCoords()[0]/32 &amp;&amp; i[1] == y.getCoords()[1]/32 - 2){</span>
+                        //System.out.println(&quot;Dead Yellow enemy&quot;);
+<span class="nc" id="L144">                        y.kill(map);</span>
+                        
+<span class="nc" id="L146">                        return active;</span>
+                    }
+<span class="nc" id="L148">                }</span>
+
+<span class="nc bnc" id="L150" title="All 2 branches missed.">                for (RedEnemy r: rEnemies){</span>
+<span class="nc bnc" id="L151" title="All 4 branches missed.">                    if (i[0] == r.getCoords()[0]/32 &amp;&amp; i[1] == r.getCoords()[1]/32 - 2){</span>
+                        //System.out.println(&quot;Dead Yellow enemy&quot;);
+<span class="nc" id="L153">                        r.kill(map);</span>
+                        
+<span class="nc" id="L155">                        return active;</span>
+                    }
+<span class="nc" id="L157">                }</span>
+<span class="nc" id="L158">            }</span>
+            
+           
+            
+
+            
+
+            
+
+<span class="nc" id="L167">            return active;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

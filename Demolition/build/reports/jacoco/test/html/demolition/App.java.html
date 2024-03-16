@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package demolition;
+
+import processing.core.*;
+import processing.data.*;
+
+import java.util.*;
+import java.io.*;
+
+public class App extends PApplet {
+
+    public static final int WIDTH = 480;
+    public static final int HEIGHT = 480;
+    public static final int FPS = 60;
+
+    public Map currentMap;
+<span class="fc" id="L16">    private int currentMapIndex = 0;</span>
+    private ArrayList&lt;Map&gt; levels;
+    public BombGuy bombGuy; 
+    private LoadMap loadMap;
+<span class="fc" id="L20">    private Boolean lastPress = false;</span>
+    public int lives;
+    private PImage playerIcon;
+    private PImage clockIcon;
+    private int clock;
+<span class="fc" id="L25">    private int clockCounter = 0;</span>
+    private PFont font;
+<span class="fc" id="L27">    private ArrayList&lt;Bomb&gt; activeBombs = new ArrayList&lt;Bomb&gt;();</span>
+<span class="fc" id="L28">    private ArrayList&lt;YellowEnemy&gt; yellowEnemies = new ArrayList&lt;YellowEnemy&gt;();</span>
+<span class="fc" id="L29">    private ArrayList&lt;RedEnemy&gt; redEnemies = new ArrayList&lt;RedEnemy&gt;();</span>
+    private String configFileName;
+<span class="fc" id="L31">    public boolean gameOver = false;</span>
+
+
+<span class="fc" id="L34">    public App() {</span>
+<span class="fc" id="L35">    }</span>
+
+    public void settings() {
+<span class="fc" id="L38">        size(WIDTH, HEIGHT);</span>
+<span class="fc" id="L39">    }</span>
+
+    public void setup() {
+<span class="fc" id="L42">        frameRate(FPS);</span>
+        //Setup font
+<span class="fc" id="L44">        this.clockIcon = this.loadImage(&quot;icons/clock.png&quot;);</span>
+<span class="fc" id="L45">        this.playerIcon = this.loadImage(&quot;icons/player.png&quot;);</span>
+<span class="fc" id="L46">        this.font = createFont(&quot;PressStart2P-Regular.ttf&quot;,20);</span>
+<span class="fc" id="L47">        this.textFont(this.font,20);</span>
+
+<span class="fc" id="L49">        System.out.println(&quot;***** SETUP GAME *****&quot;);</span>
+
+        //Get config file
+<span class="fc" id="L52">        JSONObject config = getConfig();</span>
+<span class="fc" id="L53">        System.out.println(&quot;READ CONFIG FILE -- PASSED&quot;);</span>
+
+        //Get lives
+<span class="fc" id="L56">        this.lives = config.getInt(&quot;lives&quot;);</span>
+
+        //Get all levels
+<span class="fc" id="L59">        this.levels = this.getAllLevels(config);</span>
+<span class="fc" id="L60">        System.out.println(&quot;READ ALL LEVELS -- PASSED&quot;);</span>
+
+        // Load in first map into current map.
+<span class="fc" id="L63">        currentMap = this.levels.get(0);</span>
+<span class="fc" id="L64">        this.clock = currentMap.getTime();</span>
+
+        // Load characters
+<span class="fc" id="L67">        bombGuy = new BombGuy(this.currentMap.getStartCoords());</span>
+<span class="fc" id="L68">        bombGuy.loadResources(&quot;player/player&quot;, this);</span>
+
+<span class="fc" id="L70">        System.out.println(&quot;LOADING ENEMIES...&quot;);</span>
+<span class="fc" id="L71">        loadEnemies();</span>
+<span class="fc" id="L72">        System.out.println(&quot;DRAWING MAP...&quot;);</span>
+<span class="fc" id="L73">        drawMap();</span>
+
+<span class="fc" id="L75">        System.out.println(&quot;***** SETUP COMPLETE - GAME STARTING *****&quot;);</span>
+<span class="fc" id="L76">    }</span>
+    private void loadEnemies(){
+        //Load yellow enemies
+<span class="fc" id="L79">        this.yellowEnemies = new ArrayList&lt;YellowEnemy&gt;();</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        for (int[] i: currentMap.getYellowEnemies()){</span>
+<span class="fc" id="L81">            int[] coordsI = {i[0]*32,i[1]*32 + 64};</span>
+<span class="fc" id="L82">            YellowEnemy y = new YellowEnemy(coordsI);</span>
+<span class="fc" id="L83">            y.loadResources(&quot;yellow_enemy/yellow&quot;, this);</span>
+<span class="fc" id="L84">            yellowEnemies.add(y);</span>
+            //System.out.println(&quot;Yellow enemy added at: &quot; + i[0] + i[1]);
+<span class="fc" id="L86">        }</span>
+<span class="fc" id="L87">        this.redEnemies = new ArrayList&lt;RedEnemy&gt;();</span>
+
+        //Load red enemies
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        for (int[] i: currentMap.getRedEnemies()){</span>
+<span class="fc" id="L91">            int[] coordsI = {i[0]*32,i[1]*32 + 64};</span>
+<span class="fc" id="L92">            RedEnemy y = new RedEnemy(coordsI);</span>
+<span class="fc" id="L93">            y.loadResources(&quot;red_enemy/red&quot;, this);</span>
+<span class="fc" id="L94">            redEnemies.add(y);</span>
+            //System.out.println(&quot;Red enemy added at: &quot; + i[0] + i[1]);
+<span class="fc" id="L96">        }</span>
+<span class="fc" id="L97">    }</span>
+
+    public void draw() {
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if (this.gameOver == true){</span>
+<span class="nc" id="L101">            gameOver();</span>
+        }
+        //Tick clock
+
+<span class="fc" id="L105">        this.clockTick();</span>
+        
+        //Call bombGuy logic tick
+<span class="fc" id="L108">        this.bombGuy.tick(this,this.currentMap);</span>
+
+        //Call bomb logic tick
+<span class="fc bfc" id="L111" title="All 2 branches covered.">        for (Bomb b: activeBombs){</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">            if (b.isActive == true) {</span>
+<span class="fc" id="L113">                b.tick(this, currentMap, bombGuy,yellowEnemies,redEnemies);</span>
+            } else {
+                //Check bombguy alive
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">                if (this.bombGuy.alive == false){</span>
+<span class="fc" id="L117">                    this.lives-=1;</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">                    if (this.lives == 0){</span>
+<span class="nc" id="L119">                        gameOver(); </span>
+                    }
+
+<span class="fc bfc" id="L122" title="All 2 branches covered.">                    for (YellowEnemy y : yellowEnemies){</span>
+<span class="fc" id="L123">                        y.setCoords(y.startCoords[0],y.startCoords[1]);</span>
+<span class="fc" id="L124">                    }</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">                    for (RedEnemy r : redEnemies){</span>
+<span class="fc" id="L126">                        r.setCoords(r.startCoords[0],r.startCoords[1]);</span>
+<span class="fc" id="L127">                    }</span>
+
+<span class="fc" id="L129">                    drawMap();</span>
+<span class="fc" id="L130">                    this.bombGuy.alive = true;</span>
+                }
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">                if (Enemy.Killed == true){</span>
+<span class="nc" id="L133">                    Enemy.Killed = false;</span>
+<span class="nc" id="L134">                    drawMap();</span>
+                }
+                continue;
+            }
+<span class="fc" id="L138">        }</span>
+
+        //Call yellow enemy logic tick
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        for (YellowEnemy y: yellowEnemies){</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">            if (y.alive == true)</span>
+<span class="fc" id="L143">                y.chooseMove(this, currentMap);</span>
+<span class="pc bpc" id="L144" title="3 of 4 branches missed.">                if (y.currentCoords[0] == bombGuy.getCoords()[0] &amp;&amp; y.currentCoords[1] == bombGuy.getCoords()[1]){</span>
+<span class="nc" id="L145">                    bombGuy.kill(currentMap);</span>
+<span class="nc" id="L146">                    this.lives-=1;</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">                    if (this.lives == 0)</span>
+<span class="nc" id="L148">                        gameOver();</span>
+                    
+<span class="nc bnc" id="L150" title="All 2 branches missed.">                    for (YellowEnemy y2 : yellowEnemies){</span>
+<span class="nc" id="L151">                        y2.setCoords(y2.startCoords[0],y2.startCoords[1]);</span>
+<span class="nc" id="L152">                    }</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">                    for (RedEnemy r : redEnemies){</span>
+<span class="nc" id="L154">                        r.setCoords(r.startCoords[0],r.startCoords[1]);</span>
+<span class="nc" id="L155">                    }</span>
+<span class="nc" id="L156">                    drawMap();</span>
+                }
+<span class="fc" id="L158">        }</span>
+        //Call red enemy logic tick
+<span class="fc bfc" id="L160" title="All 2 branches covered.">        for (RedEnemy r: redEnemies){</span>
+<span class="pc bpc" id="L161" title="1 of 2 branches missed.">            if (r.alive == true)</span>
+<span class="fc" id="L162">                r.chooseMove(this, currentMap);</span>
+<span class="pc bpc" id="L163" title="3 of 4 branches missed.">                if (r.currentCoords[0] == bombGuy.getCoords()[0] &amp;&amp; r.currentCoords[1] == bombGuy.getCoords()[1]){</span>
+<span class="nc" id="L164">                    bombGuy.kill(currentMap);</span>
+<span class="nc" id="L165">                    this.lives-=1;</span>
+<span class="nc bnc" id="L166" title="All 2 branches missed.">                    if (this.lives == 0)</span>
+<span class="nc" id="L167">                        gameOver();</span>
+                    
+<span class="nc bnc" id="L169" title="All 2 branches missed.">                    for (YellowEnemy y : yellowEnemies){</span>
+<span class="nc" id="L170">                        y.setCoords(y.startCoords[0],y.startCoords[1]);</span>
+<span class="nc" id="L171">                    }</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">                    for (RedEnemy r2 : redEnemies){</span>
+<span class="nc" id="L173">                        r2.setCoords(r2.startCoords[0],r2.startCoords[1]);</span>
+<span class="nc" id="L174">                    }</span>
+<span class="nc" id="L175">                    drawMap();</span>
+                }
+<span class="fc" id="L177">        }</span>
+        
+        //Check finish line
+<span class="fc" id="L180">        checkFinishLine();</span>
+
+        //Check movement
+<span class="fc" id="L183">        this.getKeyMove();</span>
+<span class="fc" id="L184">    }</span>
+
+    private void checkFinishLine(){
+        
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        if (currentMap.getTextMap().get((bombGuy.getCoords()[1]/32)-2).get(bombGuy.getCoords()[0]/32).equals(&quot;G&quot;)){</span>
+            //System.out.println(&quot;GOAL&quot;);
+<span class="nc bnc" id="L190" title="All 2 branches missed.">            if (currentMapIndex == levels.size()-1){</span>
+<span class="nc" id="L191">                youWin();</span>
+
+            }
+            else { 
+<span class="nc" id="L195">                currentMap = levels.get(++currentMapIndex);</span>
+<span class="nc" id="L196">                drawMap();</span>
+<span class="nc" id="L197">                loadEnemies();</span>
+<span class="nc" id="L198">                bombGuy.setCoords(currentMap.getStartCoords()[0], currentMap.getStartCoords()[1]);</span>
+            }
+        }
+<span class="fc" id="L201">    }</span>
+
+    private void getKeyMove(){
+        //System.out.println(this.keyCode);
+        //System.out.println(this.keyPressed);
+<span class="fc" id="L206">        Boolean press = this.keyPressed;</span>
+<span class="fc" id="L207">        Boolean moved = false;</span>
+<span class="fc bfc" id="L208" title="All 4 branches covered.">        if (press &amp;&amp; this.lastPress == false){</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">            if (this.keyCode == UP){</span>
+                //Move up
+<span class="fc" id="L211">                moved = bombGuy.moveUp(this, currentMap);</span>
+                //System.out.println(&quot;UP&quot;);
+<span class="fc bfc" id="L213" title="All 2 branches covered.">            } else if(this.keyCode == DOWN){</span>
+                //Move down
+<span class="fc" id="L215">                moved = bombGuy.moveDown(this, currentMap);</span>
+                //System.out.println(&quot;DOWN&quot;);
+<span class="fc bfc" id="L217" title="All 2 branches covered.">            } else if(this.keyCode == LEFT){</span>
+                //Move left
+<span class="fc" id="L219">                moved = bombGuy.moveLeft(this, currentMap);</span>
+                //System.out.println(&quot;LEFT&quot;);
+<span class="fc bfc" id="L221" title="All 2 branches covered.">            } else if(this.keyCode == RIGHT){</span>
+                //Move right
+<span class="fc" id="L223">                moved = bombGuy.moveRight(this, currentMap);</span>
+                //System.out.println(this.bombGuy.getCoords()[0]);
+                //System.out.println(this.bombGuy.getCoords()[1]);
+                //System.out.println(&quot;RIGHT&quot;);
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">            } else if (Character.isWhitespace(this.key)){</span>
+                // Place bomb
+<span class="fc" id="L229">                System.out.println(&quot;Bomb Placed&quot;);</span>
+<span class="fc" id="L230">                placeBomb();</span>
+                //System.out.println(&quot;Place Bomb&quot;);
+            }
+        }
+
+<span class="fc" id="L235">        this.lastPress = press;</span>
+<span class="fc" id="L236">    }</span>
+
+    private void placeBomb(){
+<span class="fc" id="L239">        Bomb bomb = new Bomb(this.bombGuy.getCoords());</span>
+<span class="fc" id="L240">        bomb.loadSprites(this);</span>
+<span class="fc" id="L241">        this.activeBombs.add(bomb);</span>
+<span class="fc" id="L242">        bomb.detonate(this, currentMap);</span>
+<span class="fc" id="L243">    }</span>
+
+    public void drawMap(){
+        //Draws map based on 2d image array.
+<span class="fc" id="L247">        this.background(255,150,0);</span>
+        //Draw player icon and lives number
+<span class="fc" id="L249">        fill(0,0,0);</span>
+<span class="fc" id="L250">        noStroke();</span>
+<span class="fc" id="L251">        this.text(String.valueOf(this.lives), 180, 44);</span>
+<span class="fc" id="L252">        this.image(playerIcon,140,16);</span>
+        //Draw clock icon and time number
+<span class="fc" id="L254">        this.text(String.valueOf(this.clock), 320, 44);</span>
+<span class="fc" id="L255">        this.image(clockIcon,280,16);</span>
+        
+        
+
+<span class="fc" id="L259">        int x = 0;</span>
+<span class="fc" id="L260">        int y = 64;</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">        for (int i = 0; i &lt; this.currentMap.getImages().size(); i++) {</span>
+<span class="fc bfc" id="L262" title="All 2 branches covered.">            for (int j = 0; j &lt; this.currentMap.getImages().get(i).size(); j++){</span>
+<span class="fc" id="L263">                this.image(this.currentMap.getImages().get(i).get(j), x, y);</span>
+<span class="fc" id="L264">                x += 32;</span>
+            }
+<span class="fc" id="L266">            y += 32;</span>
+<span class="fc" id="L267">            x = 0;</span>
+        }
+<span class="fc" id="L269">    }</span>
+
+    private void clockTick(){
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">        if (this.clock == 0){</span>
+            while (true){
+<span class="nc" id="L274">                this.gameOver();</span>
+            }
+        }
+
+<span class="fc bfc" id="L278" title="All 2 branches covered.">        else if (this.clockCounter == 60){</span>
+<span class="fc" id="L279">            this.clockCounter = 0;</span>
+<span class="fc" id="L280">            this.clock -= 1;</span>
+<span class="fc" id="L281">            fill(255,150,0);</span>
+<span class="fc" id="L282">            rect(320,20,350,45);</span>
+<span class="fc" id="L283">            fill(0,0,0);</span>
+<span class="fc" id="L284">            this.text(String.valueOf(this.clock), 320, 44);</span>
+<span class="fc" id="L285">            this.image(clockIcon,280,16);</span>
+        } else {
+<span class="fc" id="L287">            this.clockCounter += 1;</span>
+        }
+<span class="fc" id="L289">    }</span>
+
+    public void gameOver(){
+<span class="nc" id="L292">        this.gameOver = true;</span>
+<span class="nc" id="L293">        background(255,150,0);</span>
+<span class="nc" id="L294">        textAlign(CENTER);</span>
+<span class="nc" id="L295">        this.text(&quot;GAME OVER&quot;,240, 240);</span>
+        
+<span class="nc" id="L297">        exit();</span>
+<span class="nc" id="L298">    }</span>
+    
+    public void youWin(){
+
+<span class="nc" id="L302">        background(255,150,0);</span>
+<span class="nc" id="L303">        textAlign(CENTER);</span>
+<span class="nc" id="L304">        this.text(&quot;YOU WIN&quot;,240, 240);</span>
+<span class="nc" id="L305">        this.noLoop();</span>
+
+<span class="nc" id="L307">    }</span>
+
+    public JSONObject getConfig(){
+<span class="fc" id="L310">        String jsonParse = &quot;&quot;;</span>
+        try {
+<span class="pc bpc" id="L312" title="1 of 2 branches missed.">            if (this.configFileName == null){</span>
+<span class="nc" id="L313">                this.configFileName = &quot;config.json&quot;;</span>
+            }
+
+<span class="fc" id="L316">            File configf = new File(this.configFileName);</span>
+<span class="fc" id="L317">            Scanner read = new Scanner(configf);</span>
+
+<span class="fc bfc" id="L319" title="All 2 branches covered.">            while (read.hasNextLine()){</span>
+<span class="fc" id="L320">                jsonParse += read.nextLine();</span>
+            }
+
+<span class="fc" id="L323">            read.close();</span>
+<span class="nc" id="L324">        } catch (FileNotFoundException e){</span>
+<span class="nc" id="L325">            System.out.println(&quot;No config file&quot;);</span>
+<span class="fc" id="L326">        }</span>
+        
+<span class="fc" id="L328">        JSONObject configJSON = JSONObject.parse(jsonParse);</span>
+        
+<span class="fc" id="L330">        return configJSON;</span>
+    }
+
+    public void setConfig(String filename){
+<span class="fc" id="L334">        this.configFileName = filename;</span>
+<span class="fc" id="L335">    }</span>
+    
+    public ArrayList&lt;Map&gt; getAllLevels(JSONObject config){
+<span class="fc" id="L338">        ArrayList&lt;Map&gt; levels = new ArrayList&lt;Map&gt;();</span>
+
+<span class="fc" id="L340">        JSONArray lvlsConfig = config.getJSONArray(&quot;levels&quot;);</span>
+
+<span class="fc bfc" id="L342" title="All 2 branches covered.">        for (int i = 0; i &lt; lvlsConfig.size(); i++) { </span>
+            //Passes level file object with path from config to getMapImages and returns 2d map list and time in hashmap.
+<span class="fc" id="L344">            this.loadMap = new LoadMap(new File(lvlsConfig.getJSONObject(i).getString(&quot;path&quot;)));</span>
+<span class="fc" id="L345">            levels.add(new Map(this.loadMap.getBombGuyStartCoords(),lvlsConfig.getJSONObject(i).getInt(&quot;time&quot;),this.loadMap.getMapImages(this),this.loadMap.getTextMap(i),this.loadMap.getYellowEnemies(),this.loadMap.getRedEnemies()));</span>
+            //System.out.println(this.loadMap.getRedEnemies().toString());
+        }
+
+<span class="fc" id="L349">        return levels;</span>
+    }
+    public static void main(String[] args) {
+<span class="nc" id="L352">        PApplet.main(&quot;demolition.App&quot;);</span>
+<span class="nc" id="L353">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
